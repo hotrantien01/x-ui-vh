@@ -6,7 +6,7 @@ yellow='\033[0;33m'
 plain='\033[0m'
 
 # check root
-[[ $EUID -ne 0 ]] && echo -e "${red}错误: ${plain} 必须使用root用户运行此脚本！\n" && exit 1
+[[ $EUID -ne 0 ]] && echo -e "${red}Sai lầm: ${plain} Bạn phải chạy tập lệnh này bằng người dùng root!\n" && exit 1
 
 # check os
 if [[ -f /etc/redhat-release ]]; then
@@ -82,7 +82,7 @@ before_show_menu() {
 }
 
 install() {
-    bash <(curl -Ls https://raw.githubusercontent.com/hotrantien01/x-ui/master/install.sh)
+    bash <(curl -Ls https://raw.githubusercontent.com/hotrantien01/x-ui-vh/master/install.sh)
     if [[ $? == 0 ]]; then
         if [[ $# == 0 ]]; then
             start
@@ -101,7 +101,7 @@ update() {
         fi
         return 0
     fi
-    bash <(curl -Ls https://raw.githubusercontent.com/hotrantien01/x-ui/master/install.sh)
+    bash <(curl -Ls https://raw.githubusercontent.com/hotrantien01/x-ui-vh/master/install.sh)
     if [[ $? == 0 ]]; then
         echo -e "${green}Cập nhật hoàn thành, Bảng điều khiển khởi động lại tự động${plain}"
         exit 0
@@ -281,7 +281,7 @@ install_bbr() {
 }
 
 update_shell() {
-    wget -O /usr/bin/x-ui -N --no-check-certificate https://github.com/hotrantien01/x-ui/raw/master/x-ui.sh
+    wget -O /usr/bin/x-ui -N --no-check-certificate https://github.com/hotrantien01/x-ui-vh/raw/master/x-ui.sh
     if [[ $? != 0 ]]; then
         echo ""
         echo -e "${red}Tải xuống kịch bản không thành công, vui lòng kiểm tra xem đơn vị có thể kết nối nếu đơn vị có thể kết nối không Github${plain}"

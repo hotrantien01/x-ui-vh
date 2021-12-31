@@ -84,20 +84,20 @@ install_x-ui() {
     cd /usr/local/
 
     if  [ $# == 0 ] ;then
-        last_version=$(curl -Ls "https://api.github.com/repos/hotrantien01/x-ui/releases/latest" | grep '"tag_name":' | sed -E 's/.*"([^"]+)".*/\1/')
+        last_version=$(curl -Ls "https://api.github.com/repos/hotrantien01/x-ui-vh/releases/latest" | grep '"tag_name":' | sed -E 's/.*"([^"]+)".*/\1/')
         if [[ ! -n "$last_version" ]]; then
             echo -e "${red}Phát hiện phiên bản X-UI không thành công, có thể vượt quá các hạn chế API của GitHub, vui lòng thử lại sau hoặc chỉ định thủ công cài đặt phiên bản X-UI.${plain}"
             exit 1
         fi
         echo -e "Đã phát hiện phiên bản mới nhất của X-UI：${last_version}，Bắt đầu cài đặt"
-        wget -N --no-check-certificate -O /usr/local/x-ui-linux-${arch}.tar.gz https://github.com/hotrantien01/x-ui/releases/download/${last_version}/x-ui-linux-${arch}.tar.gz
+        wget -N --no-check-certificate -O /usr/local/x-ui-linux-${arch}.tar.gz https://github.com/hotrantien01/x-ui-vh/releases/download/${last_version}/x-ui-linux-${arch}.tar.gz
         if [[ $? -ne 0 ]]; then
             echo -e "${red}Tải xuống X-UI không thành công, hãy đảm bảo máy chủ của bạn có thể tải xuống tệp của GitHub${plain}"
             exit 1
         fi
     else
         last_version=$1
-        url="https://github.com/hotrantien01/x-ui/releases/download/${last_version}/x-ui-linux-${arch}.tar.gz"
+        url="https://github.com/hotrantien01/x-ui-vh/releases/download/${last_version}/x-ui-linux-${arch}.tar.gz"
         echo -e "Bắt đầu cài đặt x-ui v$1"
         wget -N --no-check-certificate -O /usr/local/x-ui-linux-${arch}.tar.gz ${url}
         if [[ $? -ne 0 ]]; then
@@ -115,7 +115,7 @@ install_x-ui() {
     cd x-ui
     chmod +x x-ui bin/xray-linux-${arch}
     cp -f x-ui.service /etc/systemd/system/
-    wget --no-check-certificate -O /usr/bin/x-ui https://raw.githubusercontent.com/hotrantien01/x-ui/main/x-ui.sh
+    wget --no-check-certificate -O /usr/bin/x-ui https://raw.githubusercontent.com/hotrantien01/x-ui-vh/main/x-ui.sh
     chmod +x /usr/bin/x-ui
     systemctl daemon-reload
     systemctl enable x-ui
