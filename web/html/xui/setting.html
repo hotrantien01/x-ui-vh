@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+{{template "head" .}}
+<style>
+    @media (min-width: 769px) {
+        .ant-layout-content {
+            margin: 24px 16px;
+        }
+    }
+
+    .ant-col-sm-24 {
+        margin-top: 10px;
+    }
+
+    .ant-tabs-bar {
+        margin: 0;
+    }
+
+    .ant-list-item {
+        display: block;
+    }
+
+    .ant-tabs-top-bar {
+        background: white;
+    }
+</style>
+<body>
+<a-layout id="app" v-cloak>
+    {{ template "commonSider" . }}
+    <a-layout id="content-layout">
+        <a-layout-content>
+            <a-spin :spinning="spinning" :delay="500" tip="loading">
+                <a-space direction="vertical">
+                    <a-space direction="horizontal">
+                        <a-button type="primary" :disabled="saveBtnDisable" @click="updateAllSetting">Sắp xếp lưu trữ</a-button>
+                        <a-button type="danger" :disabled="!saveBtnDisable" @click="restartPanel">Khởi động lại bảng</a-button>
+                    </a-space>
+                    <a-tabs default-active-key="1">
+                        <a-tab-pane key="1" tab="Cấu hình bảng điều khiển">
+                            <a-list item-layout="horizontal" style="background: white">
+                                <setting-list-item type="text" title="Bảng điều khiển nghe IP" desc="Màn hình đen mặc định IP，Bảng khởi động lại có hiệu lực" v-model="allSetting.webListen"></setting-list-item>
+                                <setting-list-item type="number" title="Cảng người nghe bảng điều khiển" desc="Bảng khởi động lại có hiệu lực" v-model.number="allSetting.webPort"></setting-list-item>
+                                <setting-list-item type="text" title="Chứng chỉ bảng điều khiển Đường dẫn tệp khóa công khai" desc="Điền vào con đường tuyệt đối của một '/' bắt đầu，Bảng khởi động lại có hiệu lực" v-model="allSetting.webCertFile"></setting-list-item>
+                                <setting-list-item type="text" title="Con đường tệp mã khóa chứng chỉ bảng điều khiển" desc="Điền vào con đường tuyệt đối của một '/' bắt đầu，Bảng khởi động lại có hiệu lực" v-model="allSetting.webKeyFile"></setting-list-item>
+                                <setting-list-item type="text" title="Đường dẫn gốc URL bảng điều khiển" desc="Phải bắt đầu với '/', kết thúc với '/'，Bảng khởi động lại có hiệu lực" v-model="allSetting.webBasePath"></setting-list-item>
+                            </a-list>
+                        </a-tab-pane>
+                        <a-tab-pane key="2" tab="thiết lập người dùng">
+                            <a-form style="background: white; padding: 20px">
+                                <a-form-item label="Tên người dùng gốc.">
+                                    <a-input v-model="user.oldUsername" style="max-width: 300px"></a-input>
+                                </a-form-item>
+                                <a-form-item label="Mật khẩu cũ">
+                                    <a-input type="password" v-model="user.oldPassword"
+                                             style="max-width: 300px"></a-input>
+                                </a-form-item>
+                                <a-form-item label="tên đăng nhập mới">
+                                    <a-input v-model="user.newUsername" style="max-width: 300px"></a-input>
+                                </a-form-item>
+                                <a-form-item label="mật khẩu mới">
+                                    <a-input type="password" v-model="user.newPassword"
+                                             style="max-width: 300px"></a-input>
+                                </a-form-item>
+                                <a-form-item>
+                                    <a-button type="primary" @click="updateUser">Ôn lại</a-button>
+                                </a-form-item>
+                            </a-form>
+                        </a-tab-pane>
+                        <a-tab-pane key="3" tab="xray Cài đặt liên quan">
+                            <a-list item-layout="horizontal" style="background: white">
+                                <setting-list-item type="textarea" title="xray Mẫu cấu hình" desc="Tạo việc sản xuất cuối cùng với mẫu này xray Hồ sơ, bảng khởi động lại có hiệu lực" v-model="allSetting.xrayTemplateConfig"></setting-list-item>
+                            </a-list>
+                        </a-tab-pane>
+                        <a-tab-pane key="4" tab="các thiết lập khác">
+                            <a-list item-layout="horizontal" style="background: white">
+                                <setting-list-item type="text" title="Múi giờ" desc="Nhiệm vụ thời gian chạy theo thời gian của múi giờ, khởi động lại bảng điều khiển có hiệu lực" v-model="allSetting.timeLocation"></setting-list-item>
+                            </a-list>
+                        </a-tab-pane>
+                    </a-tabs>
+                </a-space>
+            </a-spin>
+        </a-layout-content>
+    </a-layout>
+</a-layout>
+{{template "js" .}}
+{{template "component/setting"}}
+<script>
+
+    const app = new Vue({
+        delimiters: ['[[', ']]'],
+        el: '#app',
+        data: {
+            siderDrawer,
+            spinning: false,
+            oldAllSetting: new AllSetting(),
+            allSetting: new AllSetting(),
+            saveBtnDisable: true,
+            user: {},
+        },
+        methods: {
+            loading(spinning = true) {
+                this.spinning = spinning;
+            },
+            async getAllSetting() {
+                this.loading(true);
+                const msg = await HttpUtil.post("/xui/setting/all");
+                this.loading(false);
+                if (msg.success) {
+                    this.oldAllSetting = new AllSetting(msg.obj);
+                    this.allSetting = new AllSetting(msg.obj);
+                    this.saveBtnDisable = true;
+                }
+            },
+            async updateAllSetting() {
+                this.loading(true);
+                const msg = await HttpUtil.post("/xui/setting/update", this.allSetting);
+                this.loading(false);
+                if (msg.success) {
+                    await this.getAllSetting();
+                }
+            },
+            async updateUser() {
+                this.loading(true);
+                const msg = await HttpUtil.post("/xui/setting/updateUser", this.user);
+                this.loading(false);
+                if (msg.success) {
+                    this.user = {};
+                }
+            },
+            async restartPanel() {
+                await new Promise(resolve => {
+                    this.$confirm({
+                        title: 'Khởi động lại bảng',
+                        content: 'Bạn có xác định xem bạn có muốn khởi động lại bảng điều khiển không?Bấm OK sẽ khởi động lại sau 3 giây, nếu bạn không thể truy cập bảng điều khiển sau khi khởi động lại, hãy chuyển đến máy chủ để xem thông tin nhật ký bảng điều khiển.',
+                        okText: 'Đảm bảo',
+                        cancelText: 'Hủy bỏ',
+                        onOk: () => resolve(),
+                    });
+                });
+                this.loading(true);
+                const msg = await HttpUtil.post("/xui/setting/restartPanel");
+                this.loading(false);
+                if (msg.success) {
+                    this.loading(true);
+                    await PromiseUtil.sleep(5000);
+                    location.reload();
+                }
+            }
+        },
+        async mounted() {
+            await this.getAllSetting();
+            while (true) {
+                await PromiseUtil.sleep(1000);
+                this.saveBtnDisable = this.oldAllSetting.equals(this.allSetting);
+            }
+        },
+    });
+
+</script>
+</body>
+</html>
