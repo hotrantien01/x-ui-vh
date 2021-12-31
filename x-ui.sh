@@ -155,7 +155,7 @@ reset_config() {
         return 0
     fi
     /usr/local/x-ui/x-ui setting -reset
-    echo -e "Tất cả các cài đặt bảng đã được đặt lại về mặc định, bây giờ hãy khởi động lại bảng điều khiển và sử dụng mặc định ${green}54321${plain} Bảng truy cập cổng"
+    echo -e "Tất cả các cài đặt bảng đã được đặt lại về mặc định, bây giờ hãy khởi động lại bảng điều khiển và sử dụng mặc định ${green}1103${plain} Bảng truy cập cổng"
     confirm_restart
 }
 
